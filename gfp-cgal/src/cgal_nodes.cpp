@@ -45,6 +45,9 @@
 // line height calculator
 #include <CGAL/Orthogonal_k_neighbor_search.h>
 #include <CGAL/Search_traits_2.h>
+//#include <CGAL/intersections.h>
+//#include <CGAL/Polygon_with_holes_2.h>
+#include <CGAL/Boolean_set_operations_2.h>
 
 #undef NOMINMAX
 
@@ -1446,5 +1449,137 @@ namespace geoflow::nodes::cgal {
         std::cout << "size of the rings:" << alpha_rings.size() << std::endl;
         output("boundary_rings").set(alpha_rings);
         std::cout << "CGAL AlphaShape done!" << std::endl;
+    }
+
+    float GetBagOverlap(LinearRing& polygon, LinearRingCollection alpha_polygons)
+    { 
+        typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
+        typedef CGAL::Polygon_2<K>                          Polygon_2;
+        typedef CGAL::Polygon_with_holes_2<K>    Polygon_with_holes_2;        
+        typedef K::Point_2                                    Point_2;
+
+        
+        float over_pcent = 0.0; 
+        float over_area = 0.0;
+        Polygon_2 cgal_BAG_polygon;
+        std::cout << "BAG_POLY" << std::endl;
+        for (auto& p : polygon) {
+            cgal_BAG_polygon.push_back(Point_2(p[0], p[1]));  
+            //std::cout << p[0] << "," << p[1] << std::endl;
+        }
+        double area = abs(cgal_BAG_polygon.area());
+        std::cout << "BAG Area:" << area << std::endl;
+        if (area < 100) // BAG too small then don't care
+        {
+          return 1.0;
+        }
+
+
+        std::vector<Polygon_2> alpha_poly_list;        
+        
+
+        for (auto alpha_poly : alpha_polygons) {
+
+            Polygon_2 cgal_alpha_poly;
+            //std::cout << "alpha poly" << std::endl;
+            for (int i = 0; i < alpha_poly.size() - 1; i++) {
+              cgal_alpha_poly.push_back(Point_2(alpha_poly[i][0], alpha_poly[i][1]));
+              //std::cout << pt[0] << "," << pt[1] << std::endl;
+            }
+            if (CGAL::do_intersect(cgal_alpha_poly, cgal_BAG_polygon)) {
+              std::list<Polygon_with_holes_2> polyI;
+              double totalArea = 0;
+              CGAL::intersection(cgal_alpha_poly, cgal_BAG_polygon, std::back_inserter(polyI));
+              typedef std::list<Polygon_with_holes_2>::iterator LIT;
+              for (LIT lit = polyI.begin(); lit != polyI.end(); lit++) {
+                totalArea += abs(lit->outer_boundary().area());
+              }
+              over_area += totalArea;
+            }
+         }
+        std::cout << "over_area" << over_area << std::endl;
+        //for (auto poly : alpha_poly_list) {
+        //  
+        //  bool ifinter = CGAL::do_intersect(poly, cgal_BAG_polygon);
+        //  
+        //  if (ifinter){
+        //    std::cout << "intersection found" << std::endl;
+
+        //      /*std::list<Polygon_with_holes_2> polyI;
+        //      double totalArea = 0;
+        //      CGAL::intersection(poly, cgal_BAG_polygon, std::back_inserter(polyI));
+        //      typedef std::list<Polygon_with_holes_2>::iterator LIT;
+        //      for (LIT lit = polyI.begin(); lit != polyI.end(); lit++) {
+        //        totalArea += abs(lit->outer_boundary().area());
+        //      }
+        //      over_area += totalArea;*/
+        //  }
+
+        //}
+
+        over_pcent = over_area / area;
+
+
+        //std::cout << "over_pcent" << over_pcent << std::endl;
+        return over_pcent;
+    }
+
+
+
+    void OverlapCheckNode::process() {
+
+      // ----------------- input ---------------------//
+      std::cout << "Overlap checking starts!" << std::endl;
+      //auto bag_polygons= input("linear_rings").get<LinearRing>();
+      auto bag_polygons = vector_input("linear_rings");
+      auto alpha_polygons = input("boundary_rings").get<LinearRingCollection>();
+      
+      // -------------- output --------------------//
+      vec1f overlap_penct_lst;
+      vec1i bag_type;
+      //std::vector<char> bag_type;
+
+
+      /*std::cout << "type:" <<typeid(bag_polygons[0]).name() << "one bag polygon size:"<< bag_polygons[0].size() << std::endl; //type:class std::array<float,3>one bag polygon:
+      for (auto pt : bag_polygons[0]) {
+        std::cout << typeid(pt).name()<< pt << std::endl;//float0
+      }*/
+
+
+      // -------------- process ----------------------//
+      for (size_t i = 0; i < bag_polygons.size(); ++i) {
+      //for (size_t i = 0; i < 1; ++i) {
+        auto& polygon = bag_polygons.get<LinearRing&>(i);
+        //std::cout << typeid(polygon).name() << "size:"<<polygon.size()<<std::endl;
+        float overlap = GetBagOverlap(polygon, alpha_polygons);
+        overlap_penct_lst.push_back(overlap);
+      }
+      std::cout << "wirting to file" << std::endl;
+      std::string filepath = "c:\\users\\tengw\\documents\\git\\New_plugins\\overpcent.txt";
+      std::ofstream outfile(filepath, std::fstream::out | std::fstream::trunc);
+      for (auto f : overlap_penct_lst) {
+        outfile << f << std::endl;
+        if (f >= 0.95) {
+          bag_type.push_back(3);
+        } // class 3 normal bag
+        else if (f < 0.25)
+        {
+          bag_type.push_back(1);
+        } //class 1 underground
+        else { bag_type.push_back(2); } //class2 part underground
+
+      }
+      outfile.close();
+
+
+      /*std::cout << "type:" << typeid(alpha_polygons[0]).name() << "one alpha_polygons polygon size:" << alpha_polygons[0].size() << std::endl;
+      for (auto s : alpha_polygons[0]) {
+        std::cout << typeid(s).name() <<"size:"<<s.size()<<","<< s[0]<<","<<s[1]<<","<< std::endl;//
+      }*/
+
+      output("bag_types").set(bag_type);
+
+      std::cout << "CGAL OverlapCheckNode done!" << std::endl;
+    
     }
 }

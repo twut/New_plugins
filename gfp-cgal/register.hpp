@@ -27,4 +27,5 @@ void register_nodes(geoflow::NodeRegister& node_register) {
     node_register.register_node<OBJWriterNode>("OBJWriter");
     node_register.register_node<VecOBJWriterNode>("OBJVecWriter");
     node_register.register_node<CGALAlphaShapeR>("CGALAlphaShape");
+    node_register.register_node<OverlapCheckNode>("OverlapCheckNode");
 }

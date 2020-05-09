@@ -443,4 +443,17 @@ namespace geoflow::nodes::cgal {
 
     };
 
+    class OverlapCheckNode: public Node {
+    public:
+        using Node::Node;
+        void init() {
+           add_vector_input("linear_rings", typeid(LinearRing));
+           add_vector_input("boundary_rings", typeid(LinearRingCollection));
+           add_output("bag_types", typeid(vec1i));
+           //add_output("bag_types", typeid(std::vector<char>));
+
+        }
+        void process();
+    };
+
 }
