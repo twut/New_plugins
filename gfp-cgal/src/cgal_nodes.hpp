@@ -449,11 +449,21 @@ namespace geoflow::nodes::cgal {
         void init() {
            add_vector_input("linear_rings", typeid(LinearRing));
            add_vector_input("boundary_rings", typeid(LinearRingCollection));
-           add_output("bag_types", typeid(vec1i));
+           //add_output("bag_types", typeid(vec1i));
+           add_vector_output("bag_type", typeid(int));
            //add_output("bag_types", typeid(std::vector<char>));
 
         }
         void process();
+    };
+    class ConvertLinearCollection2LinearRing : public Node {
+    public:
+      using Node::Node;
+      void init() {
+        add_vector_input("boundary_rings", typeid(LinearRingCollection));
+        add_vector_output("linear_rings", typeid(LinearRing));
+      }
+      void process();
     };
 
 }

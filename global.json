@@ -1,0 +1,163 @@
+{
+  "globals": {
+    "INPUT_FOOTPRINT_SOURCE": [
+      "str",
+      "C:/Users/tengw/Documents/TUDWork/3DKadaster/Rotterdam/BAG/BAGcut.shp"
+    ],
+    "INPUT_LAS_FILES": [
+      "str",
+      "C:/Users/tengw/Documents/TUDWork/3DKadaster/Rotterdam/AHN/C_37hn1cut.LAZ"
+    ],
+    "OUTPUT_FORMAT": [
+      "str",
+      "PostgreSQL"
+    ],
+    "OUTPUT_LAYER_PREFIX": [
+      "str",
+      "Test1"
+    ],
+    "OUTPUT_SOURCE": [
+      "str",
+      "PG:dbname='ahn3buildings' port=5432 host='localhost' user='postgres' password='1' schemas=bag_class tables='bag_class.t1'"
+    ]
+  },
+  "nodes": {
+    "CGALAlphaShape-4yxwqn": {
+      "connections": {
+        "boundary_rings": [
+          [
+            "ConvertLinearCollection2LinearRing-bibix4",
+            "boundary_rings"
+          ]
+        ]
+      },
+      "marked_inputs": {
+        "points": false
+      },
+      "marked_outputs": {
+        "boundary_points": false,
+        "boundary_rings": false,
+        "boundary_seg": false,
+        "ground_points": false
+      },
+      "parameters": {
+        "alpha_value": 1.5,
+        "sim_on": false,
+        "write to file": false
+      },
+      "position": [
+        325.5,
+        156.5
+      ],
+      "type": [
+        "processing-cgal",
+        "CGALAlphaShape"
+      ]
+    },
+    "ConvertLinearCollection2LinearRing-bibix4": {
+      "connections": {
+        "linear_rings": [
+          [
+            "OGRWriter-4yxwqn",
+            "geometries"
+          ]
+        ]
+      },
+      "marked_inputs": {
+        "boundary_rings": false
+      },
+      "marked_outputs": {
+        "linear_rings": false
+      },
+      "position": [
+        598.5,
+        177.0
+      ],
+      "type": [
+        "processing-cgal",
+        "ConvertLinearCollection2LinearRing"
+      ]
+    },
+    "LASLoader-5zy4hs": {
+      "connections": {
+        "points": [
+          [
+            "CGALAlphaShape-4yxwqn",
+            "points"
+          ]
+        ]
+      },
+      "marked_outputs": {
+        "classification": false,
+        "colors": false,
+        "intensity": false,
+        "order": false,
+        "points": false
+      },
+      "parameters": {
+        "do_filter": true,
+        "filepath": "{{INPUT_LAS_FILES}}",
+        "filter_class": 6,
+        "thin_nth": 2
+      },
+      "position": [
+        118.0,
+        142.0
+      ],
+      "type": [
+        "io-las",
+        "LASLoader"
+      ]
+    },
+    "OGRLoader-uiykht": {
+      "connections": {
+        "attributes": [
+          [
+            "OGRWriter-4yxwqn",
+            "attributes"
+          ]
+        ]
+      },
+      "marked_outputs": {
+        "attributes": false,
+        "line_strings": false,
+        "linear_rings": false
+      },
+      "parameters": {
+        "base_elevation": 0.0,
+        "filepath": "{{INPUT_FOOTPRINT_SOURCE}}"
+      },
+      "position": [
+        134.0,
+        27.0
+      ],
+      "type": [
+        "io-gdal",
+        "OGRLoader"
+      ]
+    },
+    "OGRWriter-4yxwqn": {
+      "marked_inputs": {
+        "attributes": false,
+        "geometries": false
+      },
+      "parameters": {
+        "append": true,
+        "epsg": 7415,
+        "filepath": "{{OUTPUT_SOURCE}}",
+        "gdaldriver": "{{OUTPUT_FORMAT}}",
+        "layername": "{{OUTPUT_LAYER_PREFIX}}",
+        "output_attribute_names": {},
+        "overwrite": true
+      },
+      "position": [
+        932.5,
+        77.0
+      ],
+      "type": [
+        "io-gdal",
+        "OGRWriter"
+      ]
+    }
+  }
+}
