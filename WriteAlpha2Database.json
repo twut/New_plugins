@@ -2,7 +2,7 @@
   "globals": {
     "INPUT_FOOTPRINT_SOURCE": [
       "str",
-      "C:/Users/tengw/Documents/TUDWork/3DKadaster/Rotterdam/BAG/BAGcut.shp"
+      ""
     ],
     "INPUT_LAS_FILES": [
       "str",
@@ -14,7 +14,7 @@
     ],
     "OUTPUT_LAYER_PREFIX": [
       "str",
-      "Test1"
+      "Test2"
     ],
     "OUTPUT_SOURCE": [
       "str",
@@ -114,25 +114,6 @@
       "type": [
         "io-las",
         "LASLoader"
-      ]
-    },
-    "OGRLoader-pfpn7q": {
-      "marked_outputs": {
-        "attributes": false,
-        "line_strings": false,
-        "linear_rings": false
-      },
-      "parameters": {
-        "base_elevation": 0.0,
-        "filepath": "{{INPUT_FOOTPRINT_SOURCE}}"
-      },
-      "position": [
-        550.0,
-        148.0
-      ],
-      "type": [
-        "io-gdal",
-        "OGRLoader"
       ]
     },
     "OGRWriter-zj7ubf": {
