@@ -393,6 +393,7 @@ namespace geoflow::nodes::cgal {
             add_param(ParamBool(sim_on, "sim_on",  "turn on simplification"));
             add_param(ParamFloat(alpha_value, "alpha_value",  "alpha_value"));
             add_param(ParamBool(write_2_file_on, "write to file",  "Write result to file"));
+            add_vector_output("id", typeid(int));
             
         }
         bool if_checkbox = true;

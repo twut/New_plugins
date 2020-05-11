@@ -1305,6 +1305,7 @@ namespace geoflow::nodes::cgal {
         LinearRingCollection alpha_rings;
         TriangleCollection alpha_triangles;
         vec1i segment_ids, plane_idx;
+        auto& id_terminal = vector_output("id");
 
         float min_z = 9999999;
         for (int i = 0; i < pc.size(); i++)
@@ -1417,6 +1418,8 @@ namespace geoflow::nodes::cgal {
             else
             {
                 alpha_rings.push_back(ring);
+                
+
             }
         }
         if (write_2_file_on == true)
@@ -1444,6 +1447,10 @@ namespace geoflow::nodes::cgal {
                 outfile << line << std::endl;
             }
             outfile.close();
+        }
+
+        for (int s = 0; s < alpha_rings.size(); s++) {
+          id_terminal.push_back(s);
         }
 
         std::cout << "size of the rings:" << alpha_rings.size() << std::endl;

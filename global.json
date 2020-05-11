@@ -6,7 +6,7 @@
     ],
     "INPUT_LAS_FILES": [
       "str",
-      "C:/Users/tengw/Documents/TUDWork/3DKadaster/Rotterdam/AHN/C_37hn1cut.LAZ"
+      "C:/Users/tengw/Documents/TUDWork/3DKadaster/Rotterdam/AHN/C_37hn1cut.las"
     ],
     "OUTPUT_FORMAT": [
       "str",
